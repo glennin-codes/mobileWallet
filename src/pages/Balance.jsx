@@ -34,7 +34,7 @@ export default function BalancePage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height:'100vh' }}>
       <Card sx={{ width: '80%', maxWidth: 600 }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ mb: 2 }}>
@@ -51,10 +51,18 @@ export default function BalancePage() {
           </Typography>
         </CardContent>
         <CardActions sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}>
-          <Button variant="contained" color="primary" onClick={handleRepay}>
+          <Button variant="contained" color="primary" onClick={handleRepay}
+          sx={{
+            textAlign:"center"
+          }}
+          >
             Repay Loan
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleBorrow}>
+          <Button variant="contained" color="secondary" onClick={handleBorrow}
+            sx={{
+              textAlign:"center"
+            }}
+          >
             Borrow Credit
           </Button>
         </CardActions>

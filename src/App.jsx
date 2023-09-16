@@ -60,6 +60,7 @@ function App() {
               <Routes>
                 <Route path='/' element={<WalletPage/>}/>
 
+                <Route path='/balance' element={<BalancePage/>}/>
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/transactions" element={<TransactionPage />} />
                  <Route path="/landingPage" element={<HomePage/>}/>
@@ -68,10 +69,11 @@ function App() {
                 
               </Routes>
               </ScrollToTop>
+              <MobileFooter />
             </BrowserRouter>
           
             </Container>
-          <MobileFooter />
+        
         </Box>
       </div>
     </>
