@@ -51,7 +51,7 @@ function App() {
         </Box>
 
         {/* Mobile Version */}
-        <Box display={{ xs: "block", md: "none",  }}>
+        <Box display={{ xs: "block", md: "none", maxHeight: "80vh" }}>
           <MobileNavbar />
           <Container maxWidth="lg">
        

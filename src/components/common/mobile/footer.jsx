@@ -8,7 +8,12 @@ export default function MobileFooter() {
   return (
   <Box 
  sx={{
-position:'sticky'
+    position: 'fixed',
+    bottom: 0,
+    width: '100%',
+    zIndex: 1000, 
+    my:4,
+    background:'transparent'
 
  }}
   > 
