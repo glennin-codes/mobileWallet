@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, CardActions, Button } from '@mui/material';
 
 export default function BalancePage() {

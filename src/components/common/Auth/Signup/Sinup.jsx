@@ -20,9 +20,12 @@ import Typewriter from "typewriter-effect";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
+import { loginSucces } from "../../../../../Redux/Reducer/authSlice";
+import { useDispatch } from "react-redux";
+import { createUser } from "./createUser";
 const SignUp = () => {
   const navigate = useNavigate();
-
+const dispatch=useDispatch();
   const [error, setError] = React.useState("");
   const [loading, setIsLoading] = React.useState(false);
 
@@ -60,80 +63,58 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     const { name, email, password, confirmPassword, phone } = values;
-
-    let err;
-
-    if (email === "") {
-      err = "Email is required";
-    } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-      err = "Enter a valid email!";
-    } else if (password !== confirmPassword) {
-    } else if (!/^\+(?:[0-9] ?){6,14}[0-9]$/.test(phone)) {
-      err =
-        "Your mobile number should have valid  include a country code! ..ie +2547123456789";
-    } else if (password !== confirmPassword) {
-      err = "Password provided didn't match!";
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(password)
-    ) {
-      err =
-        "Passwords should be a mixture of numbers, letters and at least a special character. It should also be a minimum of 8 characters and have at least a capital letter!";
-    } else if (name === "") {
-      err = "Name is required!";
-    }
-
-    if (err) {
-      setError(err);
-      return; // exit function early
-    }
-    const newValues = { ...values };
-    delete newValues.confirmPassword;
-    delete newValues.showPassword;
-    setValues(newValues);
-
-    setIsLoading(true);
+  
+    // Define error messages
+    const errorMessages = {
+      emailRequired: "Email is required",
+      invalidEmail: "Enter a valid email",
+      passwordMismatch: "Passwords do not match",
+      invalidPhone: "Invalid mobile number format",
+      invalidPassword:
+        "Passwords should contain at least 8 characters, including numbers, letters, and a special character",
+      nameRequired: "Name is required",
+    };
+  
+    // Reset error state
     setError("");
-
+  
     try {
-      const datas = await axios.post(
-        "https://comradesbizapi.azurewebsites.net/api/user/login",
-        values
-      );
-      console.log("data", datas);
-      if (datas) {
-        const { data, status } = datas;
-        setUser(data);
-        console.log("data", data);
-
-        if (status === 201) {
-          const { token, name, email, id } = data;
-
-          setValues("");
-          navigate("/");
-        } else {
-          setError("Something went wrong, try again later");
-        }
+      // Validate form fields
+      if (!email) throw new Error(errorMessages.emailRequired);
+      if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+        throw new Error(errorMessages.invalidEmail);
+      if (password !== confirmPassword) throw new Error(errorMessages.passwordMismatch);
+      if (!/^\+(?:[0-9] ?){6,14}[0-9]$/.test(phone))
+        throw new Error(errorMessages.invalidPhone);
+      if (
+        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(password)
+      )
+        throw new Error(errorMessages.invalidPassword);
+      if (!name) throw new Error(errorMessages.nameRequired);
+  
+      // API request to create a new user
+      const response = await createUser(values);
+  
+      // Handle the response
+      const { data, status } = response;
+  
+      if (status === 201) {
+        // User registration successful
+        localStorage.setItem("token", JSON.stringify(data.token));
+        dispatch(loginSucces());
+        setValues("");
+        navigate("/home");
       }
-      setIsLoading(false);
     } catch (error) {
-      if (error.response && error.response.status) {
-        const { status } = error.response;
-        console.log("code ", status);
-        if (status === 409) {
-          setError("User already exists");
-        } else if (status === 500) {
-          setError("Something went wrong, try again later");
-        } else {
-          setError("An unexpected error occurred");
-        }
-      } else {
-        setError("Network error, check your network connection and try again");
-      }
+      console.error("Error:", error.message);
+      setError(error.message);
+    } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="signUp-container">
@@ -296,7 +277,7 @@ const SignUp = () => {
         <Box>
           <Typography sx={{ textAlign: "center" }}>
             Already have an account?{" "}
-            <NavLink to="/login" style={{ color: "red" }}>
+            <NavLink to="/" style={{ color: "red" }}>
               Login
             </NavLink>
           </Typography>

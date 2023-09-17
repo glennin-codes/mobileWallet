@@ -12,69 +12,111 @@ import BalancePage from "./pages/Balance";
 import HomePage from "./pages/landingPage";
 import SignUp from "./components/common/Auth/Signup/Sinup";
 import Page404 from "./pages/404";
+import { Provider } from "react-redux";
+import store from "../Redux/Store";
+import PrivateRoute from "./components/common/Auth/PrivateRoute";
 
-const ScrollToTop=({children})=>{
-  const location=useLocation()
-  useEffect(()=>{
-window.scrollTo(0,0)
-  },[location])
-return <>
-{children}
-</>
-}
+const ScrollToTop = ({ children }) => {
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return <>{children}</>;
+};
 
 function App() {
   return (
     <>
       <div>
         {/* Desktop Version */}
-        <Box display={{ xs: "none", md: "block" }}>
-          <DeskTopNavbar />
-          <Container maxWidth="lg">
-         
-          <BrowserRouter>
-          <ScrollToTop>
-              <Routes>
-              <Route path='/' element={<WalletPage/>}/>
-              <Route path='/balance' element={<BalancePage/>}/>
-                <Route path="/transactions" element={<TransactionPage />} />
-                <Route path="/landingPage" element={<HomePage/>}/>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="*" element={<Page404/>} />
-              </Routes>
-              </ScrollToTop>
-            </BrowserRouter>
-           
-            {/* Content for desktop */}
-          </Container>
-        </Box>
 
-        {/* Mobile Version */}
-        <Box display={{ xs: "block", md: "none", maxHeight: "100vh" }}>
-          <MobileNavbar />
-          <Container maxWidth="lg">
-       
-          <BrowserRouter>
-          <ScrollToTop>
-              <Routes>
-                <Route path='/' element={<WalletPage/>}/>
+        <Provider store={store}>
+          <Box display={{ xs: "none", md: "block" }}>
+            <DeskTopNavbar />
+            <Container maxWidth="lg">
+              <BrowserRouter>
+                <ScrollToTop>
+                  <Routes>
+                    <Route path="/" element={<Login />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route
+                      path="/home"
+                      element={
+                        <PrivateRoute>
+                          <WalletPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/balance"
+                      element={
+                        <PrivateRoute>
+                          <BalancePage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/transactions"
+                      element={
+                        <PrivateRoute>
+                          <TransactionPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route path="/landingPage" element={<HomePage />} />
 
-                <Route path='/balance' element={<BalancePage/>}/>
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/transactions" element={<TransactionPage />} />
-                 <Route path="/landingPage" element={<HomePage/>}/>
-                <Route path="/login" element={<Login />} />
-                <Route path="*" element={<Page404/>} />
-                
-              </Routes>
-              </ScrollToTop>
-              <MobileFooter />
-            </BrowserRouter>
-          
+                    <Route path="*" element={<Page404 />} />
+                  </Routes>
+                </ScrollToTop>
+              </BrowserRouter>
+
+              {/* Content for desktop */}
             </Container>
-        
-        </Box>
+          </Box>
+
+          {/* Mobile Version */}
+          <Box display={{ xs: "block", md: "none", maxHeight: "100vh" }}>
+            <MobileNavbar />
+            <Container maxWidth="lg">
+              <BrowserRouter>
+                <ScrollToTop>
+                  <Routes>
+                    <Route path="/" element={<Login />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route
+                      path="/home"
+                      element={
+                        <PrivateRoute>
+                          <WalletPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/balance"
+                      element={
+                        <PrivateRoute>
+                          <BalancePage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/transactions"
+                      element={
+                        <PrivateRoute>
+                          <TransactionPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route path="/landingPage" element={<HomePage />} />
+
+                    <Route path="*" element={<Page404 />} />
+                  </Routes>
+                </ScrollToTop>
+                <MobileFooter />
+              </BrowserRouter>
+            </Container>
+          </Box>
+        </Provider>
       </div>
     </>
   );
