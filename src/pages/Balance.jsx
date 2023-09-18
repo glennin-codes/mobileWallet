@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, CardActions, Button } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../Redux/Reducer/userSlice';
 
 export default function BalancePage() {
-  const [balance, setBalance] = useState(1000); // initial balance
   const [credit, setCredit] = useState(500); // initial credit
   const [loan, setLoan] = useState(0); // initial loan
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+
+const balance = user?.user?.amount || 0
+  useEffect(() => {
+    // Fetch user data only if it's not available in the Redux state
+    if (!user?.user?._id) {
+      dispatch(fetchUserData());
+    }
+  }, [dispatch, user]);
 
   const handleRepay = () => {
     // check if the balance is sufficient
@@ -13,7 +24,7 @@ export default function BalancePage() {
       return;
     }
     // update the balance and the loan
-    setBalance(balance - loan);
+    balance - loan
     setLoan(0);
     // show a success message
     alert('Loan repaid successfully');
@@ -26,7 +37,7 @@ export default function BalancePage() {
       return;
     }
     // update the balance, the credit and the loan
-    setBalance(balance + credit);
+    balance + credit
     setLoan(loan + credit);
     setCredit(0);
     // show a success message
@@ -38,7 +49,7 @@ export default function BalancePage() {
       <Card sx={{ width: '80%', maxWidth: 600 }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ mb: 2 }}>
-            Mobile Wallet
+           {user?.user?.name} Mobile Wallet
           </Typography>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Your balance is {balance}

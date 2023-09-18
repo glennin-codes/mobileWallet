@@ -77,11 +77,13 @@ const dispatch=useDispatch()
         values
       );
       if (response) {
-        console.log(response.data);
-        const { token, status } = response;
+     
+        const { token } = response.data;
+       console.log(response.data.token);
         setIsLoading(false);
-        if (status === 200) {
+        if (response.status === 200) {
           localStorage.setItem("token", JSON.stringify(token));
+      
           dispatch(loginSucces());
           setValues("");
           setSucces("logged in succesfull");

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,55 +9,62 @@ import {
   Button,
   Snackbar,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import Alert from '@mui/material/Alert';
+import { useDispatch, useSelector } from "react-redux";
+import { deposit, fetchUserData, withdraw } from "../../Redux/Reducer/userSlice";
 
 
 export default function WalletPage() {
-  const [balance, setBalance] = useState(1000); // initial balance
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const [amount, setAmount] = useState(''); // amount to deposit or withdraw
   const [open, setOpen] = useState(false); // snackbar open state
     const [message, setMessage] = useState(''); // snackbar message
     const [severity, setSeverity] = useState('success'); // snackbar severity
   
-  const handleDeposit = () => {
-    // validate the amount
-    if (amount <= 0) {
-      setMessage('Invalid amount');
-            setSeverity('error');
-            setOpen(true);
-            return;
-    }
- // show a success message
- setBalance(balance + Number(amount));
- setMessage(`Deposited ${amount} successfully`);
- setSeverity('success');
- setOpen(true);
+    useEffect(() => {
+      // Fetch user data only if it's not available in the Redux state
+      if (!user?.user?._id) {
+        dispatch(fetchUserData());
+      }
+    }, [dispatch, user]);
 
-  };
+    const handleDeposit = () => {
+      // Validate the amount
+      if (amount <= 0) {
+        setMessage('Invalid amount');
+        setSeverity('error');
+        setOpen(true);
+        return;
+      }
+  
+      // Dispatch deposit action
+      dispatch(deposit({ userId: user.id, amount }));
+    };
 
-  const handleWithdraw = () => {
-    // validate the amount
-    if (amount <= 0) {
-          setMessage('Invalid amount');
-      setSeverity('error');
-      setOpen(true);
-      return;
-    }
-    // check if the balance is sufficient
-    if (balance < amount) {
-      setMessage('Insufficient balance');
-      setSeverity('error');
-      setOpen(true);
-      return;
-    }
-    // update the balance
-    setBalance(balance - amount);
-      // show a success message
-    setMessage(`Withdrawn ${amount} successfully`);
-    setSeverity('success');
-    setOpen(true);
-  };
+ 
+    const handleWithdraw = () => {
+      // Validate the amount
+      if (amount <= 0) {
+        setMessage('Invalid amount');
+        setSeverity('error');
+        setOpen(true);
+        return;
+      }
+  
+      // Check if the balance is sufficient
+      if (user.balance < amount) {
+        setMessage('Insufficient balance');
+        setSeverity('error');
+        setOpen(true);
+        return;
+      }
+  
+      // Dispatch withdrawal action
+      dispatch(withdraw({ userId: user.id, amount }));
+    };
     const handleClose = () => {
     setOpen(false);
   };
@@ -71,17 +78,20 @@ export default function WalletPage() {
         p: 2,
       }}
     >
+      {user?.user &&
+      (
+        <>
       <Typography
         variant="h4"
-        sx={{ mb: 2, fontSize: { xs: "24px", sm: "34px" } }}
+        sx={{ mb: 2, fontSize: { xs: "18px", sm: "24px" } }}
       >
-        Mobile Wallet
+        {user?.user?.name} Mobile Wallet
       </Typography>
       <Typography
         variant="h6"
         sx={{ mb: 2, fontSize: { xs: "18px", sm: "26px" } }}
       >
-        Your balance is {balance}
+        Your balance is {user?.user?.amount}
       </Typography>
       <Card sx={{ width: { xs: "90%", sm: "50%" }, m: 1 }}>
         <CardContent>
@@ -100,26 +110,57 @@ export default function WalletPage() {
             width: "100%",
           }}
         >
-          <Button variant="contained" color="primary" onClick={handleDeposit}>
-            Deposit
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleWithdraw}
-          >
-            Withdraw
-          </Button>
+         <Button
+  variant="contained"
+  color="primary"
+  onClick={handleDeposit}
+  disabled={user.depositLoading} // Disable the button while deposit is loading
+>
+  {user.depositLoading ? (
+    <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
+  ) : (
+    'Deposit'
+  )}
+</Button>
+
+<Button
+  variant="contained"
+  color="secondary"
+  onClick={handleWithdraw}
+  disabled={user.withdrawalLoading} // Disable the button while withdrawal is loading
+>
+  {user.withdrawalLoading ? (
+    <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
+  ) : (
+    'Withdraw'
+  )}
+</Button>
         </CardActions>
 
       </Card>
+      </>
+  )
+}
       <Snackbar open={open} autoHideDuration={3000} 
         anchorOrigin={{
           vertical: 'top',    // Position vertically at the top
           horizontal: 'right' // Position horizontally at the right
         }}
       onClose={handleClose}>
-       <Alert onClose={handleClose}  position='' severity={severity} sx={{ width: '100%' }}>         {message}
+       <Alert onClose={handleClose}  s  severity={
+    user?.depositSuccess
+      ? 'success'
+      : user?.withdrawalSuccess
+      ? 'success'
+      : user?.error
+      ? 'error'
+      : severity 
+  } sx={{ width: '100%' }}>      
+     {message}
+       {user?.depositSuccess && `- Deposit of ${amount} ksh was  successful `}
+    {user?.withdrawalSuccess && `- Withdrawal ${amount} successful `}
+    {user?.error && 'something went wrong,try again later' }
+
          </Alert>
       </Snackbar>
     </Box>

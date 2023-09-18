@@ -86,8 +86,6 @@ const dispatch=useDispatch();
       if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
         throw new Error(errorMessages.invalidEmail);
       if (password !== confirmPassword) throw new Error(errorMessages.passwordMismatch);
-      if (!/^\+(?:[0-9] ?){6,14}[0-9]$/.test(phone))
-        throw new Error(errorMessages.invalidPhone);
       if (
         !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(password)
       )
