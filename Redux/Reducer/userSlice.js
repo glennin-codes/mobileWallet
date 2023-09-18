@@ -78,7 +78,7 @@ const withdraw = createAsyncThunk(
       const response = await makeWithdrawal(userId, amount, phone);
       const updatedUserData = await getUserData(userId);
 
-    return updatedUserData.data;
+      return updatedUserData.data;
     } catch (error) {
       throw error;
     }
@@ -106,7 +106,6 @@ const userSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(deposit.pending, (state) => {
-        // Add this
         state.depositLoading = true;
       })
       .addCase(deposit.fulfilled, (state, action) => {
@@ -119,7 +118,6 @@ const userSlice = createSlice({
         state.depositLoading = false; // Update the loading state
       })
       .addCase(withdraw.pending, (state) => {
-        // Add this
         state.withdrawalLoading = true;
       })
       .addCase(withdraw.fulfilled, (state, action) => {

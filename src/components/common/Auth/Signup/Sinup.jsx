@@ -25,7 +25,7 @@ import { useDispatch } from "react-redux";
 import { createUser } from "./createUser";
 const SignUp = () => {
   const navigate = useNavigate();
-const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const [error, setError] = React.useState("");
   const [loading, setIsLoading] = React.useState(false);
 
@@ -63,9 +63,9 @@ const dispatch=useDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     const { name, email, password, confirmPassword, phone } = values;
-  
+
     // Define error messages
     const errorMessages = {
       emailRequired: "Email is required",
@@ -76,28 +76,31 @@ const dispatch=useDispatch();
         "Passwords should contain at least 8 characters, including numbers, letters, and a special character",
       nameRequired: "Name is required",
     };
-  
+
     // Reset error state
     setError("");
-  
+
     try {
       // Validate form fields
       if (!email) throw new Error(errorMessages.emailRequired);
       if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
         throw new Error(errorMessages.invalidEmail);
-      if (password !== confirmPassword) throw new Error(errorMessages.passwordMismatch);
+      if (password !== confirmPassword)
+        throw new Error(errorMessages.passwordMismatch);
       if (
-        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(password)
+        !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/.test(
+          password
+        )
       )
         throw new Error(errorMessages.invalidPassword);
       if (!name) throw new Error(errorMessages.nameRequired);
-  
+
       // API request to create a new user
       const response = await createUser(values);
-  
+
       // Handle the response
       const { data, status } = response;
-  
+
       if (status === 201) {
         // User registration successful
         localStorage.setItem("token", JSON.stringify(data.token));
@@ -112,7 +115,6 @@ const dispatch=useDispatch();
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="signUp-container">

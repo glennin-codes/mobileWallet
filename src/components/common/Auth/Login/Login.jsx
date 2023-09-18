@@ -32,7 +32,7 @@ const Login = () => {
     password: "",
     showPassword: false,
   });
-const dispatch=useDispatch()
+  const dispatch = useDispatch();
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -77,13 +77,12 @@ const dispatch=useDispatch()
         values
       );
       if (response) {
-     
         const { token } = response.data;
-       console.log(response.data.token);
+        console.log(response.data.token);
         setIsLoading(false);
         if (response.status === 200) {
           localStorage.setItem("token", JSON.stringify(token));
-      
+
           dispatch(loginSucces());
           setValues("");
           setSucces("logged in succesfull");
