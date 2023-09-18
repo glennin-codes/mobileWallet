@@ -1,10 +1,20 @@
-FROM node:lts-alpine
-ENV NODE_ENV=production
-WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
-COPY . .
-EXPOSE 5173
-RUN chown -R node /usr/src/app
-USER node
-CMD ["npm", "start"]
+FROM node:lts-alpine as BUILD_IMAGE
+ WORKDIR /app/react-app
+ COPY package.json .
+    RUN npm install
+    COPY . .
+    COPY docker-compose.yml .
+    COPY Makefile .
+    RUN npm run build
+
+    FROM node:lts-alpine as PRODUCTION_IMAGE
+    WORKDIR /app/react-app
+    COPY --from=BUILD_IMAGE /app/react-app/dist/  /app/react-app/dist
+   EXPOSE 8000
+    COPY package.json .
+    COPY vite.config.js .
+     COPY docker-compose.yml .
+    COPY Makefile .
+    RUN npm install
+     EXPOSE 8000
+    CMD [ "npm",'run','preview' ]
