@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Card, CardMedia, CardContent, CardActions, Button } from '@mui/material';
 
 export default function HomePage() {
-  // sample cards data
+ 
   const cards = [
     {
       id: 1,

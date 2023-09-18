@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getUserData, makeDeposit, makeWithdrawal } from "../api";
 import { decodeToken } from "../../utils/DecodeToken/decodeToken";
+import { pollForCallbackData } from "../utils/poolCallBackData";
 
 // Initial state
 const initialState = {
@@ -35,6 +36,7 @@ const fetchUserData = createAsyncThunk("user/fetchUserData", async () => {
   }
 });
 
+
 // Deposit
 const deposit = createAsyncThunk("user/deposit", async ({ userId, amount }) => {
   try {
@@ -51,9 +53,12 @@ const deposit = createAsyncThunk("user/deposit", async ({ userId, amount }) => {
     const phone = decodedData.phone;
 
     const response = await makeDeposit(userId, amount, phone);
-    const updatedUserData = await getUserData(userId);
+    console.log("response",response)
+    const data=  pollForCallbackData();
+    console.log("calBackData",data);
+    // const updatedUserData = await getUserData(userId);
 
-    return updatedUserData.data;
+   ;
   } catch (error) {
     throw error;
   }

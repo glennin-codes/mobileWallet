@@ -75,7 +75,7 @@ function App() {
           </BrowserRouter>
 
           {/* Mobile Version */}
-          <Box display={{ xs: "block", md: "none", maxHeight: "100vh" }}>
+          <Box display={{ xs: "block", md: "none", minHeight: { xs: '50vh', sm: '80vh', }, }}>
           <BrowserRouter>
            <MobileNavbar />
             <Container maxWidth="lg">

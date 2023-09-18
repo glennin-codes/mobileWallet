@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Card, CardContent, CardActions, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserData } from '../../Redux/Reducer/userSlice';
+import { Link } from 'react-router-dom';
 
 export default function BalancePage() {
-  const [credit, setCredit] = useState(500); // initial credit
-  const [loan, setLoan] = useState(0); // initial loan
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
-const balance = user?.user?.amount || 0
   useEffect(() => {
     // Fetch user data only if it's not available in the Redux state
     if (!user?.user?._id) {
@@ -17,65 +15,37 @@ const balance = user?.user?.amount || 0
     }
   }, [dispatch, user]);
 
-  const handleRepay = () => {
-    // check if the balance is sufficient
-    if (balance < loan) {
-      alert('Insufficient balance to repay the loan');
-      return;
-    }
-    // update the balance and the loan
-    balance - loan
-    setLoan(0);
-    // show a success message
-    alert('Loan repaid successfully');
-  };
-
-  const handleBorrow = () => {
-    // check if the credit is available
-    if (credit <= 0) {
-      alert('No credit available to borrow');
-      return;
-    }
-    // update the balance, the credit and the loan
-    balance + credit
-    setLoan(loan + credit);
-    setCredit(0);
-    // show a success message
-    alert('Credit borrowed successfully');
-  };
+  const balance = user?.user?.amount || 0;
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height:'100vh' }}>
-      <Card sx={{ width: '80%', maxWidth: 600 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: { xs: '60vh', sm: '80vh', }, // Adjust minHeight for mobile (xs) and small screens (sm)
+        backgroundColor: '#f0f0f0',
+        mt: 2,
+      }}
+    >
+      <Card sx={{ width: '80%', maxWidth: 400 }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h4" sx={{ mb: 2 }}>
-           {user?.user?.name} Mobile Wallet
+          <Typography variant="h4" sx={{ mb: 2, textAlign: 'center' }}>
+            {user?.user?.name}'s Wallet
           </Typography>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Your balance is {balance}
+            Your balance:
           </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Your credit limit is {credit}
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Your loan amount is {loan}
+          <Typography variant="h3" sx={{ mb: 2, color: balance >= 0 ? 'green' : 'red' }}>
+            ${balance.toFixed(2)}
           </Typography>
         </CardContent>
-        <CardActions sx={{ display: 'flex', justifyContent: 'space-around', width: '100%' }}>
-          <Button variant="contained" color="primary" onClick={handleRepay}
-          sx={{
-            textAlign:"center"
-          }}
-          >
-            Repay Loan
+        <CardActions sx={{ justifyContent: 'center' }}>
+          <Link to='/home'>
+          <Button variant="contained" color="primary">
+            Add Funds
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleBorrow}
-            sx={{
-              textAlign:"center"
-            }}
-          >
-            Borrow Credit
-          </Button>
+          </Link>
         </CardActions>
       </Card>
     </Box>

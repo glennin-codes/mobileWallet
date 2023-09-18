@@ -130,7 +130,7 @@ export default function WalletPage() {
   variant="contained"
   color="primary"
   onClick={handleDeposit}
-  disabled={user.depositLoading} // Disable the button while deposit is loading
+  disabled={user?.depositLoading} // Disable the button while deposit is loading
 >
   {user.depositLoading ? (
     <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
@@ -145,7 +145,7 @@ export default function WalletPage() {
   onClick={handleWithdraw}
   disabled={user.withdrawalLoading} // Disable the button while withdrawal is loading
 >
-  {user.withdrawalLoading ? (
+  {user?.withdrawalLoading ? (
     <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
   ) : (
     'Withdraw'
