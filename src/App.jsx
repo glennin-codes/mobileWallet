@@ -31,10 +31,10 @@ function App() {
         {/* Desktop Version */}
 
         <Provider store={store}>
-          <Box display={{ xs: "none", md: "block" }}>
-            <DeskTopNavbar />
-            <Container maxWidth="lg">
-              <BrowserRouter>
+          <BrowserRouter>
+            <Box display={{ xs: "none", md: "block" }}>
+              <DeskTopNavbar />
+              <Container maxWidth="lg">
                 <ScrollToTop>
                   <Routes>
                     <Route path="/" element={<Login />} />
@@ -68,17 +68,18 @@ function App() {
                     <Route path="*" element={<Page404 />} />
                   </Routes>
                 </ScrollToTop>
-              </BrowserRouter>
 
-              {/* Content for desktop */}
-            </Container>
-          </Box>
+                {/* Content for desktop */}
+              </Container>
+            </Box>
+          </BrowserRouter>
 
           {/* Mobile Version */}
           <Box display={{ xs: "block", md: "none", maxHeight: "100vh" }}>
-            <MobileNavbar />
+          <BrowserRouter>
+           <MobileNavbar />
             <Container maxWidth="lg">
-              <BrowserRouter>
+             
                 <ScrollToTop>
                   <Routes>
                     <Route path="/" element={<Login />} />
@@ -113,8 +114,9 @@ function App() {
                   </Routes>
                 </ScrollToTop>
                 <MobileFooter />
-              </BrowserRouter>
+            
             </Container>
+            </BrowserRouter>
           </Box>
         </Provider>
       </div>
