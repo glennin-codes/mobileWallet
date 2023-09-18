@@ -51,8 +51,9 @@ const deposit = createAsyncThunk("user/deposit", async ({ userId, amount }) => {
     const phone = decodedData.phone;
 
     const response = await makeDeposit(userId, amount, phone);
+    const updatedUserData = await getUserData(userId);
 
-    return response;
+    return updatedUserData.data;
   } catch (error) {
     throw error;
   }
@@ -75,8 +76,9 @@ const withdraw = createAsyncThunk(
       const phone = decodedData.phone;
 
       const response = await makeWithdrawal(userId, amount, phone);
-      
-      return response;
+      const updatedUserData = await getUserData(userId);
+
+    return updatedUserData.data;
     } catch (error) {
       throw error;
     }

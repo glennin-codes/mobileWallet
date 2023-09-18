@@ -31,40 +31,56 @@ export default function WalletPage() {
       }
     }, [dispatch, user]);
 
-    const handleDeposit = () => {
-      // Validate the amount
-      if (amount <= 0) {
-        setMessage('Invalid amount');
-        setSeverity('error');
-        setOpen(true);
-        return;
-      }
-  
-      // Dispatch deposit action
-      dispatch(deposit({ userId: user.id, amount }));
-    };
+
 
  
-    const handleWithdraw = () => {
-      // Validate the amount
+    const handleDeposit = async () => {
       if (amount <= 0) {
         setMessage('Invalid amount');
         setSeverity('error');
         setOpen(true);
         return;
       }
-  
-      // Check if the balance is sufficient
+    
+      // Dispatch deposit action and wait for it to complete
+      await dispatch(deposit({ userId: user.id, amount }));
+    
+      // You can now fetch the user data again to get the updated balance
+      await dispatch(fetchUserData());
+    
+      // Show a success message
+      setMessage(`Deposited ksh ${amount} successfully`);
+      setSeverity('success');
+      setOpen(true);
+    };
+    
+    const handleWithdraw = async () => {
+      if (amount <= 0) {
+        setMessage('Invalid amount');
+        setSeverity('error');
+        setOpen(true);
+        return;
+      }
+    
       if (user.balance < amount) {
         setMessage('Insufficient balance');
         setSeverity('error');
         setOpen(true);
         return;
       }
-  
-      // Dispatch withdrawal action
-      dispatch(withdraw({ userId: user.id, amount }));
+    
+      // Dispatch withdrawal action and wait for it to complete
+      await dispatch(withdraw({ userId: user.id, amount }));
+    
+      // You can now fetch the user data again to get the updated balance
+      await dispatch(fetchUserData());
+    
+      // Show a success message
+      setMessage(`Withdrawal of ksh ${amount} was  successfully credited to ${user?.user?.phone}`);
+      setSeverity('success');
+      setOpen(true);
     };
+    
     const handleClose = () => {
     setOpen(false);
   };
@@ -157,8 +173,7 @@ export default function WalletPage() {
       : severity 
   } sx={{ width: '100%' }}>      
      {message}
-       {user?.depositSuccess && `- Deposit of ${amount} ksh was  successful `}
-    {user?.withdrawalSuccess && `- Withdrawal ${amount} successful `}
+
     {user?.error && 'something went wrong,try again later' }
 
          </Alert>
