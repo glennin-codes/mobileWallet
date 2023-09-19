@@ -1,16 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getUserData, makeDeposit, makeWithdrawal } from "../api";
 import { decodeToken } from "../../utils/DecodeToken/decodeToken";
-import { pollForCallbackData } from "../utils/poolCallBackData";
 
 // Initial state
 const initialState = {
   user: null,
   balance: 0,
   isLoading: false,
-  depositLoading: false,
+  // depositLoading: false,
   withdrawalLoading: false,
-  depositSuccess: false,
+  // depositSuccess: false,
   withdrawalSuccess: false,
   error: null,
 };
@@ -37,32 +36,28 @@ const fetchUserData = createAsyncThunk("user/fetchUserData", async () => {
 });
 
 
-// Deposit
-const deposit = createAsyncThunk("user/deposit", async ({ userId, amount }) => {
-  try {
-    const token = localStorage.getItem("token");
+// // Deposit
+// const deposit = createAsyncThunk("user/deposit", async ({ userId, amount }) => {
+//   try {
+//     const token = localStorage.getItem("token");
 
-    if (!token) {
-      throw new Error("Token not found");
-    }
+//     if (!token) {
+//       throw new Error("Token not found");
+//     }
 
-    // Decode the token to get the user ID
-    const decodedData = decodeToken(token);
-    console.log(decodedData);
-    const userId = decodedData.userId;
-    const phone = decodedData.phone;
+//     // Decode the token to get the user ID
+//     const decodedData = decodeToken(token);
+//     console.log(decodedData);
+//     const userId = decodedData.userId;
+//     const phone = decodedData.phone;
 
-    const response = await makeDeposit(userId, amount, phone);
-    console.log("response",response)
-    const data=  pollForCallbackData();
-    console.log("calBackData",data);
-    // const updatedUserData = await getUserData(userId);
-
-   ;
-  } catch (error) {
-    throw error;
-  }
-});
+//     const response = await makeDeposit(userId, amount, phone);
+    
+//    return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// });
 
 // Withdraw
 const withdraw = createAsyncThunk(
@@ -110,18 +105,7 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message;
       })
-      .addCase(deposit.pending, (state) => {
-        state.depositLoading = true;
-      })
-      .addCase(deposit.fulfilled, (state, action) => {
-        // state.balance = action.payload.amount;
-        state.depositSuccess = true;
-        state.depositLoading = false; // Update the loading state
-      })
-      .addCase(deposit.rejected, (state, action) => {
-        state.error = action.error.message;
-        state.depositLoading = false; // Update the loading state
-      })
+     
       .addCase(withdraw.pending, (state) => {
         state.withdrawalLoading = true;
       })
@@ -139,4 +123,4 @@ const userSlice = createSlice({
 
 export default userSlice.reducer;
 
-export { fetchUserData, deposit, withdraw };
+export { fetchUserData, withdraw };

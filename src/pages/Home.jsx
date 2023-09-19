@@ -13,16 +13,26 @@ import {
 } from "@mui/material";
 import Alert from '@mui/material/Alert';
 import { useDispatch, useSelector } from "react-redux";
-import { deposit, fetchUserData, withdraw } from "../../Redux/Reducer/userSlice";
+import {  fetchUserData, withdraw } from "../../Redux/Reducer/userSlice";
+
+import { deposit } from "../../Redux/Reducer/depositSlice";
+import PaymentModal from "../components/common/Modal";
+import axios from "axios";
 
 
 export default function WalletPage() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const depositActions=useSelector((state) => state.deposit)
   const [amount, setAmount] = useState(''); // amount to deposit or withdraw
   const [open, setOpen] = useState(false); // snackbar open state
     const [message, setMessage] = useState(''); // snackbar message
     const [severity, setSeverity] = useState('success'); // snackbar severity
+    const [modalOpen, setModalOpen] = useState(false); // State to control the modal
+    const [modalMessage, setModalMessage] = useState(''); // Message to display in the modal
+    const [modalSuccess, setModalSuccess] = useState(false); // Whether the modal shows success or error
+    const [modalError, setModalError] = useState(false); // Whether the modal shows success or error
+    const [modalLoading, setModalLoading] = useState(false); // Loading state for the modal
   
     useEffect(() => {
       // Fetch user data only if it's not available in the Redux state
@@ -33,7 +43,6 @@ export default function WalletPage() {
 
 
 
- 
     const handleDeposit = async () => {
       if (amount <= 0) {
         setMessage('Invalid amount');
@@ -42,16 +51,71 @@ export default function WalletPage() {
         return;
       }
     
-      // Dispatch deposit action and wait for it to complete
-      await dispatch(deposit({ userId: user.id, amount }));
+      try {
+        // Dispatch deposit action and wait for it to complete
+        await dispatch(deposit({ userId: user.id, amount }));
     
-      // You can now fetch the user data again to get the updated balance
-      await dispatch(fetchUserData());
+        // Show a message indicating that the deposit is in progress
+        setMessage('Deposit in progress. Please check your phone for an STK notification.');
+        setSeverity('info');
+        setOpen(true);
+        setModalSuccess(false);
+        setModalLoading(false);
+        setModalMessage("Deposit in progress. Please check your phone for an STK notification.After succesful payment verify here");
+setModalError(false)
+        setModalOpen(true);
+        setAmount('');    
+      } catch (error) {
+        setMessage('Failed to make a deposit');
+        setSeverity('error');
+      } finally {
+        setOpen(true);
+      }
+    };
+    const handleCloseModal = () => {
+      setModalOpen(false);
+    };
+  
     
-      // Show a success message
-      setMessage(`Deposited ksh ${amount} successfully`);
-      setSeverity('success');
-      setOpen(true);
+    const handleVerify = () => {
+      // Set loading state and update the message based on verification request
+      setModalLoading(true);
+      setModalMessage('Verifying payment...');
+    
+      // Send a POST request to the server
+      axios
+        .post('http://localhost:3500/api/deposit/check', {
+          userId: user?.user?._id, 
+        })
+        .then((response) => {
+          // Handle the response from the server
+          if (response.status === 200 && response.data.success) {
+            // Payment verification is successful
+            setModalMessage('Payment verified.');
+            setModalSuccess(true);
+          } 
+        })
+        .catch((error) => {
+          // Handle any errors from the request
+          console.error('Error verifying payment:', error);
+          if(error?.response?.status===404){
+            setModalMessage('Payment not found.Kindly deposit');
+            setModalSuccess(false);
+            setModalError(true);
+          }else{
+            setModalMessage('Error verifying payment.');
+            setModalSuccess(false);
+            setModalError(true);
+          }
+         
+        })
+        .finally(() => {
+          // Hide the loading state and close the modal after a delay
+          setModalLoading(false);
+          setTimeout(() => {
+            setModalOpen(false);
+          }, 3000); 
+        });
     };
     
     const handleWithdraw = async () => {
@@ -130,7 +194,7 @@ export default function WalletPage() {
   variant="contained"
   color="primary"
   onClick={handleDeposit}
-  disabled={user?.depositLoading} // Disable the button while deposit is loading
+  disabled={Boolean(depositActions.depositLoading)} // Disable the button while deposit is loading
 >
   {user.depositLoading ? (
     <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
@@ -143,7 +207,7 @@ export default function WalletPage() {
   variant="contained"
   color="secondary"
   onClick={handleWithdraw}
-  disabled={user.withdrawalLoading} // Disable the button while withdrawal is loading
+  disabled={Boolean(user.withdrawalLoading)} // Disable the button while withdrawal is loading
 >
   {user?.withdrawalLoading ? (
     <CircularProgress size={24} color="inherit" /> // Show a circular progress indicator while loading
@@ -157,18 +221,30 @@ export default function WalletPage() {
       </>
   )
 }
+<PaymentModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        onVerify={handleVerify}
+        onCancel={handleCloseModal}
+        message={modalMessage}
+        success={modalSuccess}
+        loading={modalLoading}
+        error={modalError}
+      />
       <Snackbar open={open} autoHideDuration={3000} 
         anchorOrigin={{
           vertical: 'top',    // Position vertically at the top
           horizontal: 'right' // Position horizontally at the right
         }}
       onClose={handleClose}>
-       <Alert onClose={handleClose}  s  severity={
-    user?.depositSuccess
+       <Alert onClose={handleClose}   severity={
+    depositActions.depositSuccess
       ? 'success'
       : user?.withdrawalSuccess
       ? 'success'
       : user?.error
+      ? 'error'
+      :depositActions.depositError
       ? 'error'
       : severity 
   } sx={{ width: '100%' }}>      
