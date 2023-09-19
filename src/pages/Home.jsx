@@ -88,46 +88,45 @@ setModalError(false)
         throw new Error("Token not found");
       }
   
-      // Decode the token to get the user ID
-      const decodedData = decodeToken(token);
-      const userId = decodedData.userId;
-      // Send a POST request to the server
-      axios
-        .post('http://localhost:3500/api/deposit/check', {
-          userId: userId 
-        })
-        .then((response) => {
-          // Handle the response from the server
-          if (response.status === 200 && response.data.success) {
-            // Payment verification is successful
-            setModalMessage('Payment verified.');
-            setModalSuccess(true);
-            dispatch(fetchUserData());
-          } 
-        })
-        .catch((error) => {
-          // Handle any errors from the request
-          console.error('Error verifying payment:', error);
-          if(error?.response?.status===404){
-            setModalMessage('Payment not found.Kindly deposit');
-            setModalSuccess(false);
-            setModalError(true);
-          }else{
-            setModalMessage('Error verifying payment.');
-            setModalSuccess(false);
-            setModalError(true);
-          }
-         
-        })
-        .finally(() => {
-          // Hide the loading state and close the modal after a delay
-          setModalLoading(false);
-          setTimeout(() => {
-            setModalOpen(false);
-          }, 3000); 
-        });
-    };
     
+      setTimeout(() => {
+        axios
+          .post('http://localhost:3500/api/deposit/check', {
+            phoneNumber: user?.user?.phone,
+            amount: amount
+          })
+          .then((response) => {
+            // Handle the response from the server
+            if (response.status === 200 && response.data.success) {
+              // Payment verification is successful
+              setModalMessage('Payment verified.');
+              setModalSuccess(true);
+              dispatch(fetchUserData());
+            }
+          })
+          .catch((error) => {
+            // Handle any errors from the request
+            console.error('Error verifying payment:', error);
+            if (error?.response?.status === 404) {
+              setModalMessage('Payment not found.Kindly deposit');
+              setModalSuccess(false);
+              setModalError(true);
+            } else {
+              setModalMessage('Error verifying payment.');
+              setModalSuccess(false);
+              setModalError(true);
+            }
+          })
+          .finally(() => {
+            // Hide the loading state and close the modal after a delay
+            setModalLoading(false);
+            setTimeout(() => {
+              setModalOpen(false);
+            }, 3000);
+          });
+      }, 8000); // 8 seconds delay
+      
+    }  
     const handleWithdraw = async () => {
       if (amount <= 0) {
         setMessage('Invalid amount');
