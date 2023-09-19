@@ -102,6 +102,7 @@ setModalError(false)
             // Payment verification is successful
             setModalMessage('Payment verified.');
             setModalSuccess(true);
+            dispatch(fetchUserData());
           } 
         })
         .catch((error) => {
