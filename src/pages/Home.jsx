@@ -18,6 +18,7 @@ import {  fetchUserData, withdraw } from "../../Redux/Reducer/userSlice";
 import { deposit } from "../../Redux/Reducer/depositSlice";
 import PaymentModal from "../components/common/Modal";
 import axios from "axios";
+import { decodeToken } from "../../utils/DecodeToken/decodeToken";
 
 
 export default function WalletPage() {
@@ -81,11 +82,19 @@ setModalError(false)
       // Set loading state and update the message based on verification request
       setModalLoading(true);
       setModalMessage('Verifying payment...');
-    
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Token not found");
+      }
+  
+      // Decode the token to get the user ID
+      const decodedData = decodeToken(token);
+      const userId = decodedData.userId;
       // Send a POST request to the server
       axios
         .post('http://localhost:3500/api/deposit/check', {
-          userId: user?.user?._id, 
+          userId: userId 
         })
         .then((response) => {
           // Handle the response from the server

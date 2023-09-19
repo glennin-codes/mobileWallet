@@ -20,24 +20,10 @@ export default function TransactionsPage() {
         Your Transactions
       </Typography>
       <TableContainer component={Paper} sx={{ width: { xs: '100%', sm: '80%' }, maxWidth: 800 }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Amount</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{transaction.date}</TableCell>
-                <TableCell>{transaction.type}</TableCell>
-                <TableCell>{transaction.amount}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <Typography>
+          coming soon !
+        </Typography>
+
       </TableContainer>
     </Box>
   );
