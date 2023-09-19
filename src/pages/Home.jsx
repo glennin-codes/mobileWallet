@@ -124,7 +124,7 @@ setModalError(false)
               setModalOpen(false);
             }, 3000);
           });
-      }, 8000); // 8 seconds delay
+      }, 5000); // 5 seconds delay
       
     }  
     const handleWithdraw = async () => {
